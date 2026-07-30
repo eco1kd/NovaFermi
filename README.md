@@ -1,4 +1,4 @@
-# NovaFermi
+# nv-fermi-drv
 
 An independent out-of-tree Linux kernel module (DRM/KMS) for NVIDIA Fermi-architecture GPUs, specifically the GeForce GT 430 (GF108 chip).
 
@@ -48,13 +48,21 @@ The project is currently in Phase 3 (see the table below).
 - Basic register read/write macros (`ioread32`/`iowrite32`).
 - Reading and decoding `NV_PMC_BOOT_0`, confirming the chipset ID (0xC1 = GF108).
 
-### Phase 3 -- VBIOS parser and I2C bus (in progress)
+### Phase 3 -- VBIOS parser: complete. I2C/SMBus engine: not started.
+
+VBIOS parsing (complete, verified on real hardware):
 
 - VBIOS location and read via `pci_map_rom()`, with option ROM signature validation.
 - BIT (BIOS Information Table) parser: signature search, header parsing, enumeration of all subsystem tokens, header checksum check.
-- DCB (Device Configuration Table) location via the BIT token `i`, with a legacy-pointer fallback.
-- DCB header parsing (version, header size, entry count and size).
-- In progress: pinning down the exact offsets of the GPIO and I2C tables inside the DCB header (version-dependent, verified via dmesg hex-dumps before any decoding is trusted), and I2C/SMBus engine initialization.
+- DCB (Device Configuration Table) location: tries the BIT token `i` first, falls back to the legacy pointer at 0x36, and picks whichever candidate produces a plausible DCB header (on this hardware, the BIT `i` pointer turned out to be wrong -- the legacy pointer is the one that works).
+- DCB header parsing (version, header size, entry count and size), plus DCB entry table hex-dump.
+- I2C table offset confirmed at DCB header+0x04 (verified against real table content, not just header shape).
+- GPIO table offset confirmed at DCB header+0x0a (verified against real table content -- the header+0x06 field, which some references suggest, turned out to point at executable code on this VBIOS, not a table).
+
+Not yet done (this is the part still open):
+
+- Decoding the individual I2C and GPIO table entries (bitfields for line/function/address).
+- I2C/SMBus engine initialization in `i2c.c` -- currently a stub that logs and returns.
 
 ### Phase 4 -- power and clock management (reclocking) (not started)
 
