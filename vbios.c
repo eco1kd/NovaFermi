@@ -306,28 +306,35 @@ int nv_fermi_parse_dcb(struct nv_fermi_priv *priv, struct nv_dcb_header *dcb)
 			pr_warn(DRV_NAME ": i2c_table_off=0x%04x out of bounds, skipping dump\n",
 				dcb->i2c_table_off);
 		}
+	} else {
+		pr_warn(DRV_NAME ": DCB header_len=%u too small to contain i2c_table_off\n",
+			dcb->header_len);
+	}
 
-		pr_info(DRV_NAME ": header+0x06 (0x%04x) is confirmed NOT the GPIO table (executable code) -- scanning the rest of the header for candidates\n",
-			(unsigned)(p[6] | (p[7] << 8)));
+	if (dcb->header_len >= 12) {
+		dcb->gpio_table_off = p[10] | (p[11] << 8);
 
-		{
-			size_t off;
+		pr_info(DRV_NAME ": DCB gpio_table_off=0x%04x (confirmed)\n", dcb->gpio_table_off);
 
-			for (off = 8; off + 2 <= dcb->header_len; off += 2) {
-				u16 candidate = p[off] | (p[off + 1] << 8);
-				const u8 *cp;
+		if ((size_t)dcb->gpio_table_off + 4 <= priv->vbios_len) {
+			u8 g_header_len  = priv->vbios[dcb->gpio_table_off + 1];
+			u8 g_entry_count = priv->vbios[dcb->gpio_table_off + 2];
+			u8 g_entry_len   = priv->vbios[dcb->gpio_table_off + 3];
+			size_t g_full_len = (size_t)g_header_len +
+					     (size_t)g_entry_count * g_entry_len;
 
-				if (!candidate || (size_t)candidate + 4 > priv->vbios_len)
-					continue;
-
-				cp = priv->vbios + candidate;
-				pr_info(DRV_NAME ": gpio candidate @ dcb_hdr+0x%02zx -> 0x%04x: %02x %02x %02x %02x %s\n",
-					off, candidate, cp[0], cp[1], cp[2], cp[3],
-					nv_fermi_dcb_header_plausible(cp) ? "PLAUSIBLE" : "");
+			if ((size_t)dcb->gpio_table_off + g_full_len <= priv->vbios_len) {
+				pr_info(DRV_NAME ": GPIO table raw dump (%zu bytes at 0x%04x, entry_count=%u entry_len=%u):\n",
+					g_full_len, dcb->gpio_table_off, g_entry_count, g_entry_len);
+				print_hex_dump(KERN_INFO, DRV_NAME ": gpio_tbl ", DUMP_PREFIX_OFFSET,
+						16, 1, priv->vbios + dcb->gpio_table_off, g_full_len, false);
 			}
+		} else {
+			pr_warn(DRV_NAME ": gpio_table_off=0x%04x out of bounds, skipping dump\n",
+				dcb->gpio_table_off);
 		}
 	} else {
-		pr_warn(DRV_NAME ": DCB header_len=%u too small to contain i2c/gpio pointers\n",
+		pr_warn(DRV_NAME ": DCB header_len=%u too small to contain gpio_table_off\n",
 			dcb->header_len);
 	}
 
