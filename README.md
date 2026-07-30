@@ -77,7 +77,7 @@ DRM/KMS subsystem integration for display init and video output management, GEM/
 Requires the headers for your currently running kernel to be installed.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/eco1kd/NovaFermi.git
 cd nv-fermi-drv
 make
 ```
