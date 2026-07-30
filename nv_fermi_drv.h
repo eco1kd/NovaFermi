@@ -23,6 +23,7 @@ struct nv_dcb_header {
 	u8  entry_count;
 	u8  entry_len;
 	u16 i2c_table_off;
+	u16 gpio_table_off;
 };
 
 struct nv_fermi_priv {
