@@ -1,5 +1,3 @@
-# The project will be temporarily suspended, I'm having problems with this computer.
-
 # nv-fermi-drv
 
 An independent out-of-tree Linux kernel module (DRM/KMS) for NVIDIA Fermi-architecture GPUs, specifically the GeForce GT 430 (GF108 chip).
