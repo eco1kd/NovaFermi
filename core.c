@@ -51,13 +51,11 @@ static int nv_fermi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	priv->bar1_len = pci_resource_len(pdev, 1);
 	priv->bar1 = pci_ioremap_bar(pdev, 1);
-	if (!priv->bar1) {
-		pr_err(DRV_NAME ": failed to map BAR1\n");
-		ret = -ENOMEM;
-		goto err_unmap_bar0;
-	}
-	pr_info(DRV_NAME ": BAR1 (VRAM) mapped, size=%llu bytes\n",
-		(unsigned long long)priv->bar1_len);
+	if (!priv->bar1)
+		pr_warn(DRV_NAME ": failed to map BAR1 (VRAM) -- continuing without it\n");
+	else
+		pr_info(DRV_NAME ": BAR1 (VRAM) mapped, size=%llu bytes\n",
+			(unsigned long long)priv->bar1_len);
 
 	boot0 = nv_rd32(priv, NV_PMC_BOOT_0);
 	pr_info(DRV_NAME ": NV_PMC_BOOT_0 = 0x%08x (raw chip id)\n", boot0);
@@ -89,9 +87,8 @@ static int nv_fermi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	return 0;
 
-err_unmap_bar0:
-	iounmap(priv->bar0);
 err_release:
+	iounmap(priv->bar0);
 	pci_release_regions(pdev);
 err_disable:
 	pci_disable_device(pdev);
