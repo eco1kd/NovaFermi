@@ -1,4 +1,4 @@
-# nv-fermi-drv
+# NovaFermi
 
 An independent out-of-tree Linux kernel module (DRM/KMS) for NVIDIA Fermi-architecture GPUs, specifically the GeForce GT 430 (GF108 chip).
 
