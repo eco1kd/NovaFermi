@@ -58,6 +58,9 @@ int nv_fermi_read_vbios(struct nv_fermi_priv *priv) {
             "may not be directly accessible without an ACPI/legacy fallback\n",
             priv->vbios_len >= 1 ? priv->vbios[0] : 0,
             priv->vbios_len >= 2 ? priv->vbios[1] : 0);
+            kfree(priv->vbios);
+    priv->vbios = NULL;
+    priv->vbios_len = 0;
     return -EINVAL;
   }
 
