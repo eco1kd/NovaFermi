@@ -78,7 +78,7 @@ Requires the headers for your currently running kernel to be installed.
 
 ```bash
 git clone https://github.com/eco1kd/NovaFermi.git
-cd nv-fermi-drv
+cd NovaFermi
 make
 ```
 
