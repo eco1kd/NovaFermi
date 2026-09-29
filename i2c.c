@@ -15,7 +15,7 @@ struct nv_ccb_entry {
 };
 
 static void nv_fermi_ccb_decode(const u8 *e, struct nv_ccb_entry *out) {
-  out->access_method = e[3];
+  out->access_method = e[3] & 0x0f;
   out->phys_port = e[0] & 0x0f;
   out->speed = (e[0] >> 4) & 0x0f;
   out->dp_hybrid = e[1] & 0x01;
