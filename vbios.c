@@ -58,7 +58,7 @@ int nv_fermi_read_vbios(struct nv_fermi_priv *priv) {
             "may not be directly accessible without an ACPI/legacy fallback\n",
             priv->vbios_len >= 1 ? priv->vbios[0] : 0,
             priv->vbios_len >= 2 ? priv->vbios[1] : 0);
-            kfree(priv->vbios);
+    kfree(priv->vbios);
     priv->vbios = NULL;
     priv->vbios_len = 0;
     return -EINVAL;
@@ -113,7 +113,7 @@ static int nv_fermi_parse_bit_header(struct nv_fermi_priv *priv,
            hdr->token_size, NV_BIT_MIN_TOKEN_SIZE);
     return -EINVAL;
   }
-  if (bit_sig_off + hdr->header_size > priv->vbios_len) {
+  if (bit_sig_off + NV_BIT_SIGNATURE_LEN + hdr->header_size > priv->vbios_len) {
     pr_err(DRV_NAME
            ": BIT header_size=%u runs past the end of the VBIOS (len=%zu)\n",
            hdr->header_size, priv->vbios_len);
@@ -127,7 +127,7 @@ static int nv_fermi_parse_bit_header(struct nv_fermi_priv *priv,
                      "expected 0x00) -- data may be corrupted\n",
             sum);
 
-  *tokens_off = bit_sig_off + hdr->header_size;
+  *tokens_off = bit_sig_off + NV_BIT_SIGNATURE_LEN + hdr->header_size;
   return 0;
 }
 
