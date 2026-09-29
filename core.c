@@ -83,7 +83,7 @@ static int nv_fermi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 			pr_warn(DRV_NAME ": DCB parsing failed -- I2C/GPIO tables unavailable\n");
 	}
 
-	nv_fermi_i2c_init(priv);
+	(void)nv_fermi_i2c_init(priv);
 
 	return 0;
 
